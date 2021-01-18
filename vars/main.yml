@@ -19,10 +19,13 @@ dependencies:
     - mdadm
   zfs:
     - "linux-headers-{{ ansible_kernel }}"
-    - linux-headers-generic
-    - zfsutils-linux
+#   - linux-headers-generic  # doesn't exist on buster
     - zfs-initramfs
     - zfs-dkms  # for ZFS 0.8 using the PPA
+  # these need to be installed after the module is modprobe'd
+  zfs_postinst:
+    - zfsutils-linux
+
 
 mirrors:
   stretch: http://httpredir.debian.org/debian

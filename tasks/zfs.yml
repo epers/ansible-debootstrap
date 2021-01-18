@@ -10,9 +10,32 @@
     and zfs_pool is defined
     and dbstrp_zfs_backport|default(False)
 
+- name: install ZFS ppa for buster
+  apt_repository:
+    repo: ppa:jonathonf/zfs-debian
+  register: _dbstrp_zfs_backport_repo
+  when: >-
+    ansible_distribution == "Debian"
+    and ansible_distribution_release in ["buster"]
+    and zfs_pool is defined
+    and dbstrp_zfs_backport|default(False)
+
 - name: install dependencies
   apt:
     name: "{{ dependencies.zfs }}"
+    state: latest
+    update_cache: >-
+      {{ _dbstrp_zfs_backport_repo.changed }}
+
+# force-load the module in case apt didn't do it for us
+- name: load ZFS module
+  modprobe:
+    name: zfs
+    state: present
+
+- name: install post-module-load dependencies
+  apt:
+    name: "{{ dependencies.zfs_postinst }}"
     state: latest
     update_cache: >-
       {{ _dbstrp_zfs_backport_repo.changed }}
